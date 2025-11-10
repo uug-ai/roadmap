@@ -1,0 +1,111 @@
+name: Create User Story Issue
+
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: 'Short descriptive title for the user story'
+        required: true
+        type: string
+      role:
+        description: 'User role (e.g., user, developer, admin)'
+        required: true
+        type: string
+        default: 'user'
+      goal:
+        description: 'What the user wants to achieve'
+        required: true
+        type: string
+      benefit:
+        description: 'The benefit or reason for this goal'
+        required: true
+        type: string
+      acceptance_criteria:
+        description: >-
+          Acceptance criteria (one per line, will be formatted as a list)
+        required: true
+        type: string
+      priority:
+        description: 'Priority level'
+        required: true
+        type: choice
+        options:
+          - High
+          - Medium
+          - Low
+        default: 'Medium'
+      story_points:
+        description: 'Story points estimate (complexity)'
+        required: true
+        type: string
+        default: '3'
+
+jobs:
+  create-issue:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: Create User Story Issue
+        uses: actions/github-script@v7
+        env:
+          ISSUE_TITLE: ${{ inputs.title }}
+          USER_ROLE: ${{ inputs.role }}
+          USER_GOAL: ${{ inputs.goal }}
+          USER_BENEFIT: ${{ inputs.benefit }}
+          ACCEPTANCE_CRITERIA: ${{ inputs.acceptance_criteria }}
+          PRIORITY: ${{ inputs.priority }}
+          STORY_POINTS: ${{ inputs.story_points }}
+        with:
+          script: |
+            const title = process.env.ISSUE_TITLE;
+            const role = process.env.USER_ROLE;
+            const goal = process.env.USER_GOAL;
+            const benefit = process.env.USER_BENEFIT;
+            const acceptanceCriteria = process.env.ACCEPTANCE_CRITERIA;
+            const priority = process.env.PRIORITY;
+            const storyPoints = process.env.STORY_POINTS;
+
+            // Format acceptance criteria as a list
+            const criteriaLines = acceptanceCriteria
+              .split('\n')
+              .filter(line => line.trim() !== '')
+              .map(line => `- ${line.trim()}`)
+              .join('\n');
+
+            const body = [
+              '## User Story',
+              '',
+              `As a **${role}**,`,
+              `I want **${goal}**,`,
+              `So that **${benefit}**.`,
+              '',
+              '## Acceptance Criteria',
+              '',
+              criteriaLines,
+              '',
+              '## Story Details',
+              '',
+              `**Priority:** ${priority}`,
+              `**Story Points:** ${storyPoints}`
+            ].join('\n');
+
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['user-story']
+            });
+
+            console.log(`Created issue #${issue.data.number}`);
+            core.summary
+              .addHeading('User Story Created')
+              .addLink(
+                `Issue #${issue.data.number}`,
+                issue.data.html_url
+              )
+              .write();
+

@@ -41,6 +41,24 @@ We welcome community input on our roadmap:
 2. **Suggestions**: Create new issues with the `suggestion` label for feature requests
 3. **Discussions**: Use GitHub Discussions for broader roadmap conversations
 
+### Creating User Story Issues
+
+We provide a GitHub Action workflow to create well-formatted user story issues. To use it:
+
+1. Go to the **Actions** tab in this repository
+2. Select **"Create User Story Issue"** workflow
+3. Click **"Run workflow"**
+4. Fill in the required fields:
+   - **Title**: Short descriptive title for the user story
+   - **Role**: User role (e.g., user, developer, admin)
+   - **Goal**: What the user wants to achieve
+   - **Benefit**: The benefit or reason for this goal
+   - **Acceptance Criteria**: One criterion per line
+   - **Priority**: High, Medium, or Low (default: Medium)
+   - **Story Points**: Complexity estimate (default: 3)
+
+The workflow will automatically create a properly formatted issue with the user story template.
+
 ## 📊 Status Tracking
 
 Each roadmap item includes:
